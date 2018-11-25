@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>会员注册</title>
+    <link href="/js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/js/bootstrap/validator/css/bootstrapValidator.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-5">
+            <form class="form-horizontal" id="regForm">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">用户名：</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="userName" id="userName" onblur="isExists(this);">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" >密码：</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="password" name="password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" style="padding-right: 0;">确认密码：</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="confirmPWD" name="confirmPWD">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">手机号：</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="phone" name="phone">
+                            <span class="input-group-btn">
+                                <button  id="postCodeButton" class="btn btn-addon" type="button" onclick="postCode(this);">发送验证码</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">验证码：</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="phoneCode" name="phoneCode">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">邮箱：</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="email" name="email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">生日：</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="birthday" name="birthday">
+                    </div>
+                </div>
+                <div class="form-group" id="areaSelect">
+                    <label class="col-sm-2 control-label" >地区：</label>
+
+                </div>
+                <div style="margin-left: 419px;">
+                    <button type="button" onclick="regMember()" id="redButton" class="btn btn-primary" >注册</button>
+                    <button type="reset" class="btn btn-info" >重置</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/bootstrap/validator/js/bootstrapValidator.min.js"></script>
+<script src="/js/bootstrap/js/bootstrap.min.js"></script>
+<script src="/js/bootstrap/bootbox/bootbox.min.js"></script>
+<script src="/js/bootstrap/validator/js/language/zh_CN.js"></script>
+<script>
+    $(function(){
+        initSelect(0);
+        validator();
+    })
+    function validator(){
+        $("#regForm").bootstrapValidator({
+            message: '所填信息不符合规则',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                userName: {
+                    validators: {
+                        notEmpty: {
+                            message: '用户名不能为空!'
+                        },
+                        stringLength:{
+                            min:4,
+                            max:8,
+                            message: '长度在4-8位之间'
+                        }
+                    }
+                },
+                password: {
+                    validators: {
+                        notEmpty: {
+                            message: '密码不能为空!'
+                        },
+                        identical: {
+                            field: 'confirmPWD',
+                            message: '密码与其确认不一致'
+                        },
+                        stringLength:{
+                            min:4,
+                            max:8,
+                            message: '长度在4-8位之间'
+                        }
+                    }
+                },
+                confirmPWD: {
+                    validators: {
+                        notEmpty: {
+                            message: '密码不能为空!'
+                        },
+                        identical: {
+                            field: 'password',
+                            message: '密码与其确认不一致'
+                        }
+                    }
+                },
+                phone: {
+                    validators: {
+                        notEmpty: {
+                            message: '手机不能为空!'
+                        },
+                        stringLength:{
+                            min:11,
+                            max:11,
+                            message: '长度必须是11位数'
+                        }
+                    },
+
+                },
+                email: {
+                    validators: {
+                        notEmpty: {
+                            message: '邮箱不能为空'
+                        },
+                        emailAddress: {
+                            message: '邮箱地址格式有误'
+                        }
+                    }
+                },
+                birthday: {
+                    validators: {
+                        notEmpty: {
+                            message: '日期不能为空'
+                        },
+                        date: {
+                            format: 'YYYY-MM-DD',
+                            message: '格式必须为yyyy-MM-dd'
+                        }
+                    }
+                },
+                phoneCode: {
+                    validators: {
+                        notEmpty: {
+                            message: '验证码不能为空'
+                        },
+                        stringLength:{
+                            min:4,
+                            max:4,
+                            message: '长度必须是4位数'
+                        },
+                        regexp: {//自定义校验
+                            regexp: /^[0-9]+(.[0-9]+)?$/,//正则表达式
+                            message: '验证码只能为数字'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    function initSelect(id,obj){
+        $.ajax({
+            url:"/queryArea.jhtml?id="+id,
+            type:"get",
+            success:function(result){
+                console.info(result)
+                if(result.code == 200) {
+                    if(id!=0) {
+                        $(obj).parent().nextAll().remove();
+                        var index= obj.selectedIndex ;
+                        var text = obj.options[index].text;
+                        $(obj).prev().val(text);
+                    }
+
+                    if(result.data.length<1){
+                        return;
+                    }
+
+                    var data = result.data;
+                    var str = '<div class="col-sm-3" >' +
+                        '   <input type="text" name="areaText">                     <select class="form-control" name="area" onchange="initSelect(this.value,this);">' +
+                        '                            <option value="-1">--请选择--</option>';
+                    for (var i =0;i<data.length;i++){
+                        str+='<option value="'+data[i].areaId+'">'+data[i].areaName+'</option>';
+                    }
+                    str+='</select><div>';
+                    $("#areaSelect").append(str);
+                }
+            }
+        })
+
+    }
+    function regMember(){
+        $("#regForm").data('bootstrapValidator').validate();//启用验证
+        var flag = $("#regForm").data('bootstrapValidator').isValid()//验证是否通过true/false
+        if(flag==false){
+            return false;
+        }
+        if($("#confirmPWD").val()!= $("#password").val()){
+            bootbox.alert({
+                title : "提示信息",
+                message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>两次密码必须相同',
+                size:"small"
+            });
+            return false;
+        }
+        if($("select[name='area']").length!=3){
+            bootbox.alert({
+                title : "提示信息",
+                message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>请选择地区',
+                size:"small"
+            });
+            return;
+        }
+        if($("select[name='area']")[2].value==-1){
+            bootbox.alert({
+                title : "提示信息",
+                message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>请选择地区',
+                size:"small"
+            });
+            return;
+        }
+        var area1 = $("select[name='area']")[0].value;
+        var area2 = $("select[name='area']")[1].value;
+        var area3 = $("select[name='area']")[2].value;
+        var areaText1 = $("input[name='areaText']")[0].value;
+        var areaText2 = $("input[name='areaText']")[1].value;
+        var areaText3 = $("input[name='areaText']")[2].value;
+        var areaInfo = areaText1+areaText2+areaText3;
+        var userName =  $("#userName").val();
+        var password = $("#password").val();
+        var phone = $("#phone").val();
+        var email = $("#email").val();
+        var birthday = $("#birthday").val();
+        var phoneCode = $("#phoneCode").val();
+        $.ajax({
+            url:"/addMember.jhtml",
+            type:"post",
+            data:{"userName":userName,
+                "password":password,
+                "phone":phone,
+                "email":email,
+                "area1":area1,
+                "area2":area2,
+                "area3":area3,
+                "areaInfo":areaInfo,
+                "birthday":birthday,
+                "phoneCode":phoneCode},
+            success:function(result){
+                if(result.code!=200){
+                    bootbox.alert({
+                        title : "提示信息",
+                        message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>注册失败',
+                        size:"small"
+                    });
+                }else{
+                    bootbox.alert({
+                        title : "提示信息",
+                        message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>注册成功',
+                        size:"small"
+                    });
+                }
+            }
+        })
+    }
+    function postCode(obj){
+        if($("#phone").val()==""){
+            bootbox.alert({
+                title : "提示信息",
+                message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>手机号不能为空',
+                size:"small"
+            });
+            return;
+        }
+        $(obj).attr("disabled",true);
+        settime(obj);
+        $.ajax({
+            url:"/sendSMS.jhtml?mobile="+$("#phone").val(),
+            type:"post",
+            success:function(result){
+                if(result.code!=200){
+                    console.info(result)
+                    bootbox.alert({
+                        title : "提示信息",
+                        message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>验证码发送失败',
+                        size:"small"
+                    });
+                }
+            }
+        })
+    }
+
+    var countdown=3;
+    function settime(obj) {
+        if (countdown == 0){
+            $(obj).html('发送验证码');
+            $("#phone").css("width","344px");
+            $("#postCodeButton").attr("disabled",false);
+            countdown = 3;
+            return;
+        } else {
+            $("#phone").css("width","330px");
+            $(obj).html('正在发送...(' + countdown + ')');
+            countdown--;
+        }
+        setTimeout(function() { settime(obj) },1000)
+
+    }
+    function isExists(){
+        if($("#userName").val()==""){
+            bootbox.alert({
+                title : "提示信息",
+                message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>用户名为空',
+                size:"small"
+            });
+            $("#regButton").prop("disabled","disabled");
+            return;
+        }
+        $.ajax({
+            url:"/queryUserNameByUserName.jhtml?userName="+$("#userName").val(),
+            type:"get",
+            success:function(result){
+                if(result.code!=200){
+                    bootbox.alert({
+                        title : "提示信息",
+                        message : '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>'+result.msg,
+                        size:"small"
+                    });
+                    $("#regButton").attr("disabled",true);
+                }else{
+                    $('#regButton').attr("disabled",false);
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

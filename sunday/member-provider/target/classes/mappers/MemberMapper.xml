@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+   
+<mapper namespace="com.fh.member.provider.mapper.IMemberMapper">
+	<insert id="addMember" parameterType="com.fh.member.api.po.Member">
+	insert into t_member(userName, password,phone,email,birthday,regTime,lastLoginTime,area1,area2,area3,areaInfo)
+	values(#{userName},#{password},#{phone},#{email},#{birthday},#{regTime},#{lastLoginTime},#{area1},#{area2},#{area3},#{areaInfo});
+	</insert>
+
+	<select id="queryUserNameByUserName" parameterType="com.fh.member.api.po.Member" resultType="com.fh.member.api.po.Member">
+		  select id,userName, password,phone,email,birthday,regTime,lastLoginTime,area1,area2,area3,areaInfo from t_member where userName=#{userName}
+	</select>
+</mapper>
